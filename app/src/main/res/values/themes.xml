@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.StepathonDemo" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.StepathonDemo.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/ic_launcher_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_robo</item>
+        <item name="windowSplashScreenAnimationDuration">400</item>
+        <item name="postSplashScreenTheme">@style/Theme.StepathonDemo</item>
+    </style>
+</resources>
