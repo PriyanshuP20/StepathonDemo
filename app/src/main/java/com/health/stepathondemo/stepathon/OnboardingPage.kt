@@ -1,10 +1,11 @@
 package com.health.stepathondemo.stepathon
 
+import androidx.annotation.StringRes
+
 data class OnboardingPage(
     val id: Int,
     val backgroundColorsId: List<Int>,
     val iconRes: Int,
-    val heading: String,
-    val description: String,
+    @StringRes val headingRes: Int,
+    @StringRes val descriptionRes: Int,
 )
-

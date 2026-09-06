@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">StepathonDemo</string>
+    <string name="app_title">Step-a-thon</string>
+    <string name="back">Back</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_lets_go">Let\'s Go</string>
+
+    <string name="onboarding_heading_1">Step Up and Score</string>
+    <string name="onboarding_description_1">Join the Race, Lace Up, and \nEmbrace Health!</string>
+    <string name="onboarding_heading_2">Claim the Throne</string>
+    <string name="onboarding_description_2">Compete with your colleagues for Top \nRanks</string>
+    <string name="onboarding_heading_3">Score Big!!</string>
+    <string name="onboarding_description_3">Victory Unlocks Spectacular Vouchers, \nCashbacks, and Beyond</string>
 </resources>

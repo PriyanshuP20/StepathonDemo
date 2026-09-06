@@ -15,8 +15,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -42,6 +40,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -69,14 +68,15 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.airbnb.lottie.compose.LottieAnimation
@@ -85,6 +85,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.health.stepathondemo.R
 import com.health.stepathondemo.stepathon.components.CurvedText
+import com.health.stepathondemo.ui.theme.CurvedTitle
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -118,7 +119,8 @@ fun MascotOnboardingScreen(
     val pos = remember { Animatable(0f) }
     val index by remember { derivedStateOf { pos.value.roundToInt().coerceIn(0, lastIndex) } }
 
-    val dragPerStep = with(density) { 180.dp.toPx() }
+    val dragStep = dimensionResource(R.dimen.onboarding_swipe_step)
+    val dragPerStep = with(density) { dragStep.toPx() }
 
     val goTo: (Int) -> Unit = { target ->
         scope.launch {
@@ -158,6 +160,7 @@ fun MascotOnboardingScreen(
     )
 
     var stageCenter by remember { mutableStateOf(Offset.Zero) }
+    var stageSize by remember { mutableStateOf(IntSize.Zero) }
 
     Box(
         modifier = modifier
@@ -213,23 +216,26 @@ fun MascotOnboardingScreen(
 
             IconButton(
                 onClick = { goTo(index - 1) },
-                modifier = Modifier.padding(start = 8.dp, top = 8.dp)
+                modifier = Modifier.padding(
+                    start = dimensionResource(R.dimen.back_button_padding),
+                    top = dimensionResource(R.dimen.back_button_padding)
+                )
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_back),
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.back),
                     tint = Color.White,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(dimensionResource(R.dimen.back_icon_size))
                 )
             }
 
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 CurvedText(
-                    text = "Step-a-thon",
-                    fontSize = 40.sp,
-                    radius = 150.dp,
+                    text = stringResource(R.string.app_title),
+                    fontSize = CurvedTitle.fontSize,
+                    radius = dimensionResource(R.dimen.curved_title_radius),
                     color = Color.White,
-                    glowRadius = 18.dp,
+                    glowRadius = dimensionResource(R.dimen.curved_title_glow),
                     glowColor = Color.White.copy(alpha = 0.75f)
                 )
             }
@@ -239,6 +245,7 @@ fun MascotOnboardingScreen(
                     .fillMaxWidth()
                     .weight(1f)
                     .onGloballyPositioned { coords ->
+                        stageSize = coords.size
                         stageCenter = coords.positionInRoot() +
                             Offset(coords.size.width / 2f, coords.size.height / 2f)
                     }
@@ -247,6 +254,10 @@ fun MascotOnboardingScreen(
                     Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
+                    val sparkleSize = dimensionResource(R.dimen.sparkle_size)
+                    val sparkleHalf = sparkleSize / 2f
+                    val sparkleInnerPadding = dimensionResource(R.dimen.sparkle_inner_padding)
+                    val sparkleEdgePadding = dimensionResource(R.dimen.sparkle_edge_padding)
                     Image(
                         painter = painterResource(R.drawable.bg_rotating_star),
                         contentDescription = null,
@@ -260,82 +271,115 @@ fun MascotOnboardingScreen(
                                 scaleY = 1.25f
                             }
                     )
+
                     LottieAnimation(
                         composition = sparkleComposition,
                         iterations = LottieConstants.IterateForever,
                         modifier = Modifier
                             .align(Alignment.TopStart)
-                            .size(53.dp)
-                            .padding(4.dp)
-                            .padding(start = 16.dp)
+                            .size(sparkleSize)
+                            .padding(sparkleInnerPadding)
+                            .padding(start = sparkleEdgePadding)
+                            .graphicsLayer {
+                                val t = pos.value.coerceIn(0f, 1f)
+                                alpha = t
+                                val k = 1f - t
+                                translationX = (stageSize.width / 2f - (sparkleEdgePadding + sparkleHalf).toPx()) * k
+                                translationY = (stageSize.height / 2f - sparkleHalf.toPx()) * k
+                                scaleX = 0.5f + 0.5f * t
+                                scaleY = 0.5f + 0.5f * t
+                            }
+                    )
+                    LottieAnimation(
+                        composition = sparkleComposition,
+                        iterations = LottieConstants.IterateForever,
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .size(sparkleSize)
+                            .padding(sparkleInnerPadding)
+                            .padding(end = sparkleEdgePadding)
+                            .graphicsLayer {
+                                val t = pos.value.coerceIn(0f, 1f)
+                                alpha = t
+                                val k = 1f - t
+                                translationX = ((sparkleEdgePadding + sparkleHalf).toPx() - stageSize.width / 2f) * k
+                                translationY = (sparkleHalf.toPx() - stageSize.height / 2f) * k
+                                scaleX = 0.5f + 0.5f * t
+                                scaleY = 0.5f + 0.5f * t
+                            }
                     )
                 }
-                IconStage(pages = pages, pos = pos, modifier = Modifier.fillMaxSize(), cornerPadding = 0.dp)
+                IconStage(
+                    pages = pages,
+                    pos = pos,
+                    smallSize = dimensionResource(R.dimen.corner_preview_size),
+                    modifier = Modifier.fillMaxSize(),
+                    cornerPadding = 0.dp
+                )
             }
-
-            LottieAnimation(
-                composition = sparkleComposition,
-                iterations = LottieConstants.IterateForever,
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .size(53.dp)
-                    .padding(4.dp)
-                    .padding(end = 16.dp)
-            )
 
             AnimatedContent(
                 targetState = index,
                 modifier = Modifier.fillMaxWidth(),
                 transitionSpec = {
-                    (fadeIn(tween(250)) + slideInVertically(tween(250)) { it / 3 }) togetherWith
-                            (fadeOut(tween(250)) + slideOutVertically(tween(250)) { -it / 3 })
+                    fadeIn(tween(250)) togetherWith fadeOut(tween(250))
                 },
                 label = "copy"
             ) { i ->
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(pages[i].heading, color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.height(8.dp))
+                    Text(stringResource(pages[i].headingRes), color = Color.White, style = MaterialTheme.typography.titleLarge)
+                    Spacer(Modifier.height(dimensionResource(R.dimen.heading_bottom_spacing)))
                     Text(
-                        pages[i].description,
+                        stringResource(pages[i].descriptionRes),
                         color = Color.White.copy(alpha = 0.75f),
-                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 40.dp)
+                        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.description_horizontal_padding))
                     )
                 }
             }
 
             Row(
-                Modifier.align(Alignment.CenterHorizontally).padding(vertical = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                Modifier.align(Alignment.CenterHorizontally).padding(vertical = dimensionResource(R.dimen.dots_vertical_padding)),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.dots_spacing))
             ) {
                 pages.indices.forEach { i ->
-                    val w by animateDpAsState(if (i == index) 12.dp else 6.dp, label = "dotW")
+                    val w by animateDpAsState(
+                        if (i == index) dimensionResource(R.dimen.dot_size_selected) else dimensionResource(R.dimen.dot_size),
+                        label = "dotW"
+                    )
                     Box(
                         Modifier
-                            .size(w, 6.dp)
+                            .size(w, dimensionResource(R.dimen.dot_size))
                             .clip(CircleShape)
                             .background(Color.White.copy(alpha = if (i == index) 0.95f else 0.35f))
                     )
                 }
             }
 
+            val buttonCorner = dimensionResource(R.dimen.button_corner_radius)
+            val stripeWidth = dimensionResource(R.dimen.shine_stripe_width)
+            val stripeThickWidth = dimensionResource(R.dimen.shine_thick_stripe_width)
+            val stripeSlant = dimensionResource(R.dimen.shine_stripe_slant)
+            val stripePairGap = dimensionResource(R.dimen.shine_pair_gap)
+
             Button(
                 onClick = { if (index == lastIndex) onFinished() else goTo(index + 1) },
                 modifier = Modifier
-                    .padding(horizontal = 24.dp)
+                    .padding(horizontal = dimensionResource(R.dimen.button_horizontal_margin))
                     .fillMaxWidth()
-                    .height(56.dp)
+                    .height(dimensionResource(R.dimen.button_height))
                     .drawBehind {
 
-                        val corner = 14.dp.toPx()
+                        val corner = buttonCorner.toPx()
                         drawRoundRect(color = Color(0xFFF4F2F8), cornerRadius = CornerRadius(corner))
                         val clip = Path().apply {
                             addRoundRect(RoundRect(0f, 0f, size.width, size.height, CornerRadius(corner)))
                         }
-                        val stripeW = 12.dp.toPx()
-                        val slant = 26.dp.toPx()
-                        val pairGap = 10.dp.toPx()
+                        val stripeW = stripeWidth.toPx()
+                        val thickW = stripeThickWidth.toPx()
+                        val slant = stripeSlant.toPx()
+                        val pairGap = stripePairGap.toPx()
 
                         val groupW = size.width * 0.72f
                         val groupSpan = groupW + slant
@@ -346,33 +390,37 @@ fun MascotOnboardingScreen(
 
                         clipPath(clip) {
                             translate(x) {
-                                fun stripe(offset: Float) {
+                                fun stripe(offset: Float, width: Float) {
                                     drawPath(
                                         path = Path().apply {
                                             moveTo(offset, bottom)
-                                            lineTo(offset + stripeW, bottom)
-                                            lineTo(offset + stripeW + slant, top)
+                                            lineTo(offset + width, bottom)
+                                            lineTo(offset + width + slant, top)
                                             lineTo(offset + slant, top)
                                             close()
                                         },
                                         color = Color.White.copy(alpha = 0.6f)
                                     )
                                 }
-                                stripe(0f)
-                                stripe(groupW - 2 * stripeW - pairGap)
-                                stripe(groupW - stripeW)
+                                stripe(0f, stripeW)
+                                val thickOffset = groupW - thickW
+                                stripe(thickOffset - pairGap - stripeW, stripeW)
+                                stripe(thickOffset, thickW)
                             }
                         }
                     },
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(buttonCorner),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent,
                     contentColor = Color(0xFF171041)
                 )
             ) {
-                Text(if (index == lastIndex) "Let's Go" else "Next", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                Text(
+                    stringResource(if (index == lastIndex) R.string.onboarding_lets_go else R.string.onboarding_next),
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(dimensionResource(R.dimen.content_bottom_spacing)))
         }
     }
 }
@@ -407,7 +455,7 @@ private fun IconStage(
             val center = Offset(w / 2f, h * 0.5f)
             val corner = Offset(w - padPx - smallPx / 2f, padPx + smallPx / 2f)
 
-            val p = pos.value  // continuous state index
+            val p = pos.value
 
             pages.indices.forEach { j ->
                 val t = (p - j + 1f).coerceIn(0f, 1f)
