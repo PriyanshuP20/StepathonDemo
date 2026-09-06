@@ -237,7 +237,6 @@ fun MascotOnboardingScreen(
                 ) {
                     val sparkleSize = dimensionResource(R.dimen.sparkle_size)
                     val sparkleHalf = sparkleSize / 2f
-                    val sparkleInnerPadding = dimensionResource(R.dimen.sparkle_inner_padding)
                     val sparkleEdgePadding = dimensionResource(R.dimen.sparkle_edge_padding)
                     Image(
                         painter = painterResource(R.drawable.bg_rotating_star),
@@ -259,8 +258,7 @@ fun MascotOnboardingScreen(
                         modifier = Modifier
                             .align(Alignment.TopStart)
                             .size(sparkleSize)
-                            .padding(sparkleInnerPadding)
-                            .padding(start = sparkleEdgePadding)
+
                             .graphicsLayer {
                                 val t = pos.value.coerceIn(0f, 1f)
                                 alpha = t
@@ -277,8 +275,6 @@ fun MascotOnboardingScreen(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .size(sparkleSize)
-                            .padding(sparkleInnerPadding)
-                            .padding(end = sparkleEdgePadding)
                             .graphicsLayer {
                                 val t = pos.value.coerceIn(0f, 1f)
                                 alpha = t

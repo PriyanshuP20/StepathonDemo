@@ -15,7 +15,7 @@
     <dimen name="corner_preview_size">72dp</dimen>
 
     <!-- Sparkles -->
-    <dimen name="sparkle_size">53dp</dimen>
+    <dimen name="sparkle_size">100dp</dimen>
     <dimen name="sparkle_inner_padding">4dp</dimen>
     <dimen name="sparkle_edge_padding">16dp</dimen>
 
