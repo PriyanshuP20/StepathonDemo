@@ -2,8 +2,10 @@
 
 Implementation of the onboarding UI animation from the supplied Figma prototype, built entirely with **Jetpack Compose**. The user swipes through three pages — a walking robot mascot, a trophy, and a reward box — with per-page gradients, mascot morph transitions, Lottie sparkles, a rotating starburst, and a shine-sweep CTA, ending in a "Let's Go" action.
 
-| Page 1 — Step Up | Page 2 — Claim the Throne | Page 3 — Score Big!! |
-| --- | --- | --- | 
+| Page 1 — Step Up                              | Page 2 — Claim the Throne                     | Page 3 — Score Big!!                          |
+|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------| 
+| <img src="docs/images/View1.png" width="250"> | <img src="docs/images/View2.png" width="250"> | <img src="docs/images/View3.png" width="250"> |
+
 
 ---
 
